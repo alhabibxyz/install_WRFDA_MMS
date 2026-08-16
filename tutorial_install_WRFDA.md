@@ -447,7 +447,7 @@ make -j4
 make install
 ```
 
-# 1.3.6. Download and Install Parallel-NetCDF (1.14.1)
+# 1.3.6. Download and Install netcdf-c-4.9.3
 
 ```bash
 cd ~/install_wrf/libraries
