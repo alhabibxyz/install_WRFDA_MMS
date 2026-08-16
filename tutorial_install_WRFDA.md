@@ -448,3 +448,46 @@ make install
 ```
 
 # 1.3.6. Download and Install Parallel-NetCDF (1.14.1)
+
+```bash
+cd ~/install_wrf/libraries
+wget -c https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.9.3.tar.gz
+rm -rf netcdf-c-4.9.3
+tar xvzf v4.9.3.tar.gz
+cd netcdf-c-4.9.3
+```
+load intel environment
+```bash
+source /opt/software/intel/oneapi/setvars.sh >/dev/null 2>&1
+which mpiicc
+which mpiifort
+which icpc
+```
+set prefix and environment NetCDF-C:
+```bash
+export DIR=/home/ens_t4/install_wrf/libraries
+echo "$DIR"
+export CPPFLAGS="-I$DIR/include"
+export LDFLAGS="-L$DIR/lib"
+export LD_LIBRARY_PATH="$DIR/lib:$LD_LIBRARY_PATH"
+export AR="$HOME/bin/ar-clean"
+export RANLIB="$HOME/bin/ranlib-clean"
+```
+Configure NetCDF-C 4.9.3, compile and install:
+```bash
+CC=mpiicc \
+CXX=icpc \
+FC=mpiifort \
+F77=mpiifort \
+F90=mpiifort \
+AR="$AR" \
+RANLIB="$RANLIB" \
+./configure \
+  --prefix="$DIR" \
+  --enable-netcdf-4 \
+  --disable-dap \
+  --disable-pnetcdf
+
+make -j4
+make install
+```bash
