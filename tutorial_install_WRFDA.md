@@ -328,3 +328,68 @@ Check that the jasper library files have been installed:
 ls -lh $DIR/lib/libjasper*
 ls -lh $DIR/include/jasper
 ```
+
+# 2. Download and Install df5-1.14.6
+
+```bash
+cd $HOME/install_wrf/libraries/hdf5-1.14.6
+
+# Load Intel oneAPI
+source /opt/software/intel/oneapi/setvars.sh >/dev/null 2>&1
+
+# Paths
+export WRF_ROOT=$HOME/install_wrf
+export DIR=$WRF_ROOT/libraries
+export INTEL_INC=/opt/software/intel/oneapi/compiler/2022.0.2/linux/compiler/include/intel64
+
+# Compilers
+export CC=mpiicc
+export CXX=icpc
+export FC=mpiifort
+export F77=mpiifort
+export F90=mpiifort
+
+# Intel MPI compiler selection
+unset I_MPI_CC=icc
+unset I_MPI_CXX=icpc
+unset I_MPI_F77=ifort
+unset I_MPI_F90=ifort
+
+# Flags
+export CPPFLAGS="-I$DIR/include"
+export CFLAGS="-O3 -fPIC"
+export CXXFLAGS="-O3 -fPIC"
+export FFLAGS="-O3 -I$INTEL_INC"
+export FCFLAGS="-O3 -I$INTEL_INC"
+export LDFLAGS="-L$DIR/lib -Wl,-rpath,$DIR/lib"
+export LIBRARY_PATH="$DIR/lib"
+
+# Clean previous configuration
+make distclean 2>/dev/null || true
+rm -f config.cache config.status config.log
+rm -rf autom4te.cache
+
+# Configure
+CC=mpiicc \
+CXX=icpc \
+FC=mpiifort \
+F77=mpiifort \
+F90=mpiifort \
+./configure \
+  --prefix="$DIR" \
+  --with-zlib="$DIR" \
+  --enable-hl \
+  --enable-fortran \
+  --enable-parallel
+
+# Compile
+make -j4
+
+# Install
+make install
+```
+Check that the hdf5 library files have been installed:
+```bash
+ls -lh $HOME/install_wrf/libraries/lib/libhdf5*
+ls -lh $HOME/install_wrf/libraries/include/hdf5*
+```
