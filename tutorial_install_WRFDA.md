@@ -233,16 +233,9 @@ export LDFLAGS="-L$INTEL_LIB -L$DIR/lib"
 export CPPFLAGS="-I$DIR/include"
 ```
 
-# 1. Download and Install Zlib 1.3.1
+# 1.3.1. Download and Install Zlib 1.3.1
 
 Zlib is one of the required libraries for the WRF/WRFDA build.
-
-The following installation uses:
-
-* **Zlib:** 1.3.1
-* **Intel ICC:** 2022.0.2
-* **Intel MPI:** 2021.5.1
-* **System:** MMS HPC
 
 Move to the library installation directory:
 
@@ -278,7 +271,7 @@ $DIR/lib/libz.a
 $DIR/include/zlib.h
 $DIR/include/zconf.h
 ```
-# 2. Download and Install libpng 1.6.39
+# 1.3.2. Download and Install libpng 1.6.39
 
 ```bash
 cd $DIR
@@ -304,7 +297,7 @@ ls -lh $DIR/lib/libpng*
 ls -lh $DIR/include/png*
 LD_LIBRARY_PATH="$INTEL_LIB:$DIR/lib" ldd $DIR/lib/libpng.so.16.39.0
 ```
-# 2. Download and Install JasPer 1.900.1
+# 1.3.3. Download and Install JasPer 1.900.1
 
 ```bash
 cd $DIR
@@ -329,40 +322,58 @@ ls -lh $DIR/lib/libjasper*
 ls -lh $DIR/include/jasper
 ```
 
-# 2. Download and Install df5-1.14.6
+# 1.3.4. Download and Install df5-1.14.6
 
 ```bash
 cd $HOME/install_wrf/libraries/hdf5-1.14.6
 
+
+unset INTEL_ROOT
+unset INTEL_LIB
+unset INTEL_INC
+unset LIBRARY_PATH
+unset LD_LIBRARY_PATH
+
 # Load Intel oneAPI
-source /opt/software/intel/oneapi/setvars.sh >/dev/null 2>&1
+source /opt/software/intel/oneapi/setvars.sh --force
+echo "=== COMPILER ==="
+which icc
+which icpc
+which ifort
+which mpicc
+which mpiicc
+which mpiifort
+which mpiicpc
 
-# Paths
-export WRF_ROOT=$HOME/install_wrf
-export DIR=$WRF_ROOT/libraries
-export INTEL_INC=/opt/software/intel/oneapi/compiler/2022.0.2/linux/compiler/include/intel64
+icc --version | head -1
+icpc --version | head -1
+ifort --version | head -1
+mpicc --version | head -1
+ifort -dryrun test_f2003.f90 -o test_f2003 2>&1 | grep -E 'for_main|lib_lin|compiler/lib|intel64_lin'
+export WRF_ROOT="$HOME/install_wrf"
+export DIR="$WRF_ROOT/libraries"
 
-# Compilers
+export CPPFLAGS="-I$DIR/include"
+export CFLAGS="-O3 -fPIC"
+export CXXFLAGS="-O3 -fPIC"
+export FCFLAGS="-O3 -I/opt/software/intel/oneapi/compiler/2022.0.2/linux/compiler/include/intel64"
+export FFLAGS="$FCFLAGS"
+export LDFLAGS="-L$DIR/lib -Wl,-rpath,$DIR/lib"
 export CC=mpiicc
-export CXX=icpc
+export CXX=mpiicpc
+export FC=mpiifort
+export F77=mpiifort
+export F90=mpiifort
+unset I_MPI_CC
+unset I_MPI_CXX
+unset I_MPI_F77
+unset I_MPI_F90
+export CC=mpiicc
+export CXX=mpiicpc
 export FC=mpiifort
 export F77=mpiifort
 export F90=mpiifort
 
-# Intel MPI compiler selection
-unset I_MPI_CC=icc
-unset I_MPI_CXX=icpc
-unset I_MPI_F77=ifort
-unset I_MPI_F90=ifort
-
-# Flags
-export CPPFLAGS="-I$DIR/include"
-export CFLAGS="-O3 -fPIC"
-export CXXFLAGS="-O3 -fPIC"
-export FFLAGS="-O3 -I$INTEL_INC"
-export FCFLAGS="-O3 -I$INTEL_INC"
-export LDFLAGS="-L$DIR/lib -Wl,-rpath,$DIR/lib"
-export LIBRARY_PATH="$DIR/lib"
 
 # Clean previous configuration
 make distclean 2>/dev/null || true
