@@ -1,4 +1,4 @@
-# WRFDA Installation with Intel Compiler
+# WRFDA Compiler Installation with Intel Compiler
 
 This tutorial describes the installation of **WRFDA (WRF Data Assimilation)** using the **Intel Compiler** and **Intel MPI** environment on the MMS system.
 
