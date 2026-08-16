@@ -168,18 +168,6 @@ These components will be used in the subsequent WRFDA compilation steps.
 
 ---
 ### Instal libraries
-
-# 1. Install Zlib 1.3.1
-
-Zlib is one of the required libraries for the WRF/WRFDA build.
-
-The following installation uses:
-
-* **Zlib:** 1.3.1
-* **Intel ICC:** 2022.0.2
-* **Intel MPI:** 2021.5.1
-* **System:** MMS HPC
-
 ## 1.1. Define the Installation Directories
 
 Create environment variables for the WRF library installation:
@@ -249,59 +237,30 @@ Set the library search path:
 export LIBRARY_PATH=$INTEL_LIB:$DIR/lib:$LIBRARY_PATH
 ```
 
-## 1.4. Download Zlib
+# 1. Download and Install Zlib 1.3.1
+
+Zlib is one of the required libraries for the WRF/WRFDA build.
+
+The following installation uses:
+
+* **Zlib:** 1.3.1
+* **Intel ICC:** 2022.0.2
+* **Intel MPI:** 2021.5.1
+* **System:** MMS HPC
 
 Move to the library installation directory:
 
 ```bash
 cd $DIR
-```
-
-Download Zlib 1.3.1:
-
-```bash
 wget -c https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz
-```
-
-## 1.5. Extract Zlib
-
-Extract the downloaded archive:
-
-```bash
 tar xvzf zlib-1.3.1.tar.gz
-```
-
-Enter the Zlib source directory:
-
-```bash
 cd zlib-1.3.1
-```
-
-## 1.6. Configure Zlib
-
-Configure Zlib to use Intel MPI's C compiler wrapper and install it into `$DIR`:
-
-```bash
 CC=mpicc ./configure --prefix=$DIR
-```
-
-## 1.7. Compile Zlib
-
-Compile using 4 parallel jobs:
-
-```bash
 make -j4
-```
-
-## 1.8. Install Zlib
-
-Install the compiled library:
-
-```bash
 make install
 ```
 
-## 1.9. Verify the Installation
+# Verify the Installation
 
 Check that the Zlib library files have been installed:
 
