@@ -304,4 +304,27 @@ ls -lh $DIR/lib/libpng*
 ls -lh $DIR/include/png*
 LD_LIBRARY_PATH="$INTEL_LIB:$DIR/lib" ldd $DIR/lib/libpng.so.16.39.0
 ```
+# 2. Download and Install JasPer 1.900.1
 
+```bash
+cd $DIR
+
+wget -c https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/jasper-1.900.1.tar.gz
+
+tar xvzf jasper-1.900.1.tar.gz
+
+cd jasper-1.900.1
+
+CC=mpicc \
+CFLAGS="-O3 -fPIC -Wno-error=implicit-function-declaration -Wno-implicit-function-declaration -Wno-error=incompatible-function-pointer-types -Wno-incompatible-function-pointer-types" \
+./configure --prefix=$DIR
+
+make -j4
+
+make install
+```
+Check that the jasper library files have been installed:
+```bash
+ls -lh $DIR/lib/libjasper*
+ls -lh $DIR/include/jasper
+```
