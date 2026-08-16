@@ -254,7 +254,7 @@ make -j4
 make install
 ```
 
-Verify the Installation
+
 Check that the Zlib library files have been installed:
 
 ```bash
