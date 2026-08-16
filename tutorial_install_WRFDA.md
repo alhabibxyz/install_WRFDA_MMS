@@ -490,4 +490,139 @@ RANLIB="$RANLIB" \
 
 make -j4
 make install
+```
+
+
+
+# 1.3.7. Install netCDF-Fortran 4.6.2
+
 ```bash
+cd ~/install_wrf/libraries/netcdf-fortran-4.6.2
+
+# Clean environment variables that may interfere with
+# the Intel/GNU toolchain.
+unset LIBRARY_PATH
+unset CPATH
+unset C_INCLUDE_PATH
+unset CPLUS_INCLUDE_PATH
+unset FPATH
+unset LD_PRELOAD
+unset HDF5_PLUGIN_PATH
+
+# Load Intel oneAPI environment.
+source /opt/software/intel/oneapi/setvars.sh >/dev/null 2>&1
+
+# Installation prefix.
+export DIR=/home/riset_2/install_wrf/libraries
+
+# Intel compiler runtime libraries.
+export INTEL_LIB=/opt/software/intel/oneapi/compiler/2022.0.2/linux/compiler/lib/intel64_lin
+
+# Runtime library paths.
+export LD_LIBRARY_PATH="$INTEL_LIB:$DIR/lib:$LD_LIBRARY_PATH"
+
+# Check compilers.
+which mpiicc
+which mpiifort
+which ifort
+
+# ------------------------------------------------------------
+# GNU binutils wrappers
+#
+# GNU ar/ranlib can incorrectly load Intel libimf.so when
+# LD_LIBRARY_PATH contains the Intel compiler runtime.
+# This can cause:
+#
+#   Relink libimf.so with /lib64/libm.so.6
+#   Segmentation fault
+#
+# Therefore ar and ranlib are executed with Intel runtime
+# libraries removed from their environment.
+# ------------------------------------------------------------
+
+# ------------------------------------------------------------
+# GNU binutils wrappers
+# ------------------------------------------------------------
+
+cat > "$HOME/bin-nm-clean" <<'EOF'
+#!/bin/bash
+unset LD_LIBRARY_PATH
+unset LD_PRELOAD
+unset LIBRARY_PATH
+exec /usr/bin/nm "$@"
+EOF
+
+chmod +x "$HOME/bin-nm-clean"
+
+cat > "$HOME/bin/ar-clean" <<'EOF'
+#!/bin/bash
+unset LD_LIBRARY_PATH
+unset LD_PRELOAD
+unset LIBRARY_PATH
+exec /usr/bin/ar "$@"
+EOF
+
+chmod +x "$HOME/bin/ar-clean"
+
+cat > "$HOME/bin/ranlib-clean" <<'EOF'
+#!/bin/bash
+unset LD_LIBRARY_PATH
+unset LD_PRELOAD
+unset LIBRARY_PATH
+exec /usr/bin/ranlib "$@"
+EOF
+
+chmod +x "$HOME/bin/ranlib-clean"
+
+export NM="$HOME/bin-nm-clean"
+export AR="$HOME/bin/ar-clean"
+export RANLIB="$HOME/bin/ranlib-clean"
+
+# ------------------------------------------------------------
+# Configure
+# ------------------------------------------------------------
+
+export CPPFLAGS="-I$DIR/include"
+export LDFLAGS="-L$DIR/lib -Wl,-rpath,$DIR/lib"
+export LIBS="-lnetcdf -lpnetcdf -lhdf5_hl -lhdf5 -lz -ldl -lm"
+
+make distclean >/dev/null 2>&1 || true
+rm -f config.cache
+
+CC=mpiicc \
+FC=mpiifort \
+F77=mpiifort \
+F90=mpiifort \
+./configure \
+  --prefix="$DIR" \
+  CPPFLAGS="$CPPFLAGS" \
+  LDFLAGS="$LDFLAGS" \
+  LIBS="$LIBS" \
+  NM="$HOME/bin-nm-clean" \
+  AR="$AR" \
+  RANLIB="$RANLIB"
+
+# ------------------------------------------------------------
+# Build
+# ------------------------------------------------------------
+
+make clean
+
+export LD_LIBRARY_PATH="$INTEL_LIB:$DIR/lib"
+
+export AR="$HOME/bin/ar-clean"
+export RANLIB="$HOME/bin/ranlib-clean"
+
+make -j1
+
+# ------------------------------------------------------------
+# Install
+# ------------------------------------------------------------
+
+make install
+
+# verify installation:
+ls -l $DIR/lib/libnetcdff*
+ls -l $DIR/include/netcdf.inc
+ls -l $DIR/bin/nf-config
+```
