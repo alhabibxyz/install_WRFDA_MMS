@@ -280,6 +280,7 @@ $DIR/include/zconf.h
 ```
 # 2. Download and Install libpng 1.6.39
 
+```bash
 cd $DIR
 
 wget -c https://download.sourceforge.net/libpng/libpng-1.6.39.tar.gz
@@ -295,8 +296,12 @@ CC=mpicc ./configure \
 
 make -j4
 make install
+```
 
 Check that the libpng library files have been installed:
+```bash
 ls -lh $DIR/lib/libpng*
 ls -lh $DIR/include/png*
 LD_LIBRARY_PATH="$INTEL_LIB:$DIR/lib" ldd $DIR/lib/libpng.so.16.39.0
+```
+
