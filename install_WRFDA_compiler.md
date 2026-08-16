@@ -525,10 +525,11 @@ export LD_LIBRARY_PATH="$INTEL_LIB:$DIR/lib:$LD_LIBRARY_PATH"
 which mpiicc
 which mpiifort
 which ifort
+```
 
-# ------------------------------------------------------------
-# GNU binutils wrappers
-#
+GNU binutils wrappers
+
+```bash
 # GNU ar/ranlib can incorrectly load Intel libimf.so when
 # LD_LIBRARY_PATH contains the Intel compiler runtime.
 # This can cause:
@@ -577,7 +578,10 @@ chmod +x "$HOME/bin/ranlib-clean"
 export NM="$HOME/bin-nm-clean"
 export AR="$HOME/bin/ar-clean"
 export RANLIB="$HOME/bin/ranlib-clean"
+```
+Configure:
 
+```bash
 # ------------------------------------------------------------
 # Configure
 # ------------------------------------------------------------
@@ -620,8 +624,9 @@ make -j1
 # ------------------------------------------------------------
 
 make install
-
-# verify installation:
+```
+verify installation:
+```bash
 ls -l $DIR/lib/libnetcdff*
 ls -l $DIR/include/netcdf.inc
 ls -l $DIR/bin/nf-config
