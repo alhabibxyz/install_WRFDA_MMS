@@ -229,6 +229,8 @@ Set the library search path:
 ```bash
 # Intel libraries for linking
 export LIBRARY_PATH=$INTEL_LIB:$DIR/lib:$LIBRARY_PATH
+export LDFLAGS="-L$INTEL_LIB -L$DIR/lib"
+export CPPFLAGS="-I$DIR/include"
 ```
 
 # 1. Download and Install Zlib 1.3.1
@@ -276,5 +278,25 @@ $DIR/lib/libz.a
 $DIR/include/zlib.h
 $DIR/include/zconf.h
 ```
+# 2. Download and Install libpng 1.6.39
 
-The Zlib installation is now complete and `$DIR` can be used as the common installation prefix for the remaining WRFDA dependencies.
+cd $DIR
+
+wget -c https://download.sourceforge.net/libpng/libpng-1.6.39.tar.gz
+tar xvzf libpng-1.6.39.tar.gz
+cd libpng-1.6.39
+
+make distclean 2>/dev/null || true
+
+CC=mpicc ./configure \
+    --prefix=$DIR \
+    CPPFLAGS="-I$DIR/include" \
+    LDFLAGS="-L$DIR/lib -L$INTEL_LIB"
+
+make -j4
+make install
+
+Check that the libpng library files have been installed:
+ls -lh $DIR/lib/libpng*
+ls -lh $DIR/include/png*
+LD_LIBRARY_PATH="$INTEL_LIB:$DIR/lib" ldd $DIR/lib/libpng.so.16.39.0
