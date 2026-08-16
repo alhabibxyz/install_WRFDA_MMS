@@ -173,12 +173,6 @@ These components will be used in the subsequent WRFDA compilation steps.
 Create environment variables for the WRF library installation:
 
 ```bash
-# ============================================================
-# Zlib 1.3.1
-# Intel ICC 2022.0.2 + Intel MPI 2021.5.1
-# MMS HPC
-# ============================================================
-
 # Installation directory
 export WRF_ROOT=$HOME/install_wrf
 export DIR=$WRF_ROOT/libraries
