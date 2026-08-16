@@ -16,36 +16,8 @@ Verify that the GNU C compiler is available:
 
 ```bash
 which gcc
-```
-
-Expected output:
-
-```text
-/usr/bin/gcc
-```
-
-Check the Intel C Compiler:
-
-```bash
 which icc
-```
-
-Expected output:
-
-```text
-/opt/software/intel/oneapi/compiler/2022.0.2/linux/bin/intel64/icc
-```
-
-Check the Intel Fortran Compiler:
-
-```bash
 which ifort
-```
-
-Expected output:
-
-```text
-/opt/software/intel/oneapi/compiler/2022.0.2/linux/bin/intel64/ifort
 ```
 
 ## 3. Check Intel MPI
@@ -54,24 +26,7 @@ Check the Intel MPI C compiler wrapper:
 
 ```bash
 which mpicc
-```
-
-Expected output:
-
-```text
-/opt/software/intel/oneapi/mpi/2021.5.1/bin/mpicc
-```
-
-Check the Intel MPI Fortran compiler wrapper:
-
-```bash
 which mpif90
-```
-
-Expected output:
-
-```text
-/opt/software/intel/oneapi/mpi/2021.5.1/bin/mpif90
 ```
 
 The compiler environment used in this installation is therefore:
@@ -322,7 +277,7 @@ ls -lh $DIR/lib/libjasper*
 ls -lh $DIR/include/jasper
 ```
 
-# 1.3.4. Download and Install df5-1.14.6
+# 1.3.4. Download and Install hdf5-1.14.6
 
 ```bash
 cd $HOME/install_wrf/libraries/hdf5-1.14.6
@@ -404,3 +359,92 @@ Check that the hdf5 library files have been installed:
 ls -lh $HOME/install_wrf/libraries/lib/libhdf5*
 ls -lh $HOME/install_wrf/libraries/include/hdf5*
 ```
+# 1.3.5. Download and Install Parallel-NetCDF (1.14.1)
+!Note: If any trouble with ar:
+```bash
+ens_t4@mdclogin1:~/install_wrf/libraries/pnetcdf-1.14.1
+> ar cr libtest_ar.a test_ar.o ar: Relink /opt/software/intel/oneapi/compiler/2022.0.2/linux/compiler/lib/intel64_lin/libimf.so' with /lib64/libm.so.6' for IFUNC symbol sinf' Segmentation fault (core dumped)
+ens_t4@mdclogin1:~/install_wrf/libraries/pnetcdf-1.14.1
+ens_t4@mdclogin1:~/install_wrf/libraries/pnetcdf-1.14.1 echo "ar_exit=$?" ar_exit=139
+```
+
+Create wrapper ar for cleaning the Intel environment
+```bash
+#craeate directory
+mkdir -p ~/bin
+
+#create wrapper:
+cat > ~/bin/ar-clean <<'EOF'
+#!/bin/bash
+unset LD_LIBRARY_PATH
+unset LIBRARY_PATH
+exec /usr/bin/ar "$@"
+EOF
+
+#create wrapper:
+cat > ~/bin/ar-clean <<'EOF'
+#!/bin/bash
+unset LD_LIBRARY_PATH
+unset LIBRARY_PATH
+exec /usr/bin/ar "$@"
+EOF
+
+#then:
+cat > ~/bin/ranlib-clean <<'EOF'
+#!/bin/bash
+unset LD_LIBRARY_PATH
+unset LIBRARY_PATH
+exec /usr/bin/ranlib "$@"
+EOF
+
+#create executable:
+chmod +x ~/bin/ar-clean ~/bin/ranlib-clean
+
+#test wrapper:
+rm -f test_ar.o libtest_ar.a
+
+/usr/bin/gcc -c test_ar.c -o test_ar.o
+
+~/bin/ar-clean cr libtest_ar.a test_ar.o
+echo "ar_clean_exit=$?"
+
+~/bin/ranlib-clean libtest_ar.a
+echo "ranlib_clean_exit=$?"
+
+~/bin/ar-clean t libtest_ar.a
+```
+the output must be:
+
+```text
+ar_clean_exit=0
+ranlib_clean_exit=0
+test_ar.o
+```
+main task for compile and install parallel netcdf
+```bash
+cd ~/install_wrf/libraries
+rm -rf pnetcdf-1.14.1
+tar xvzf pnetcdf-1.14.1.tar.gz
+cd pnetcdf-1.14.1
+source /opt/software/intel/oneapi/setvars.sh >/dev/null 2>&1
+which mpiicc
+which mpiifort
+which icpc
+export DIR=/home/ens_t4/install_wrf/libraries
+
+CC=mpiicc \
+CXX=icpc \
+FC=mpiifort \
+F77=mpiifort \
+F90=mpiifort \
+AR="$HOME/bin/ar-clean" \
+RANLIB="$HOME/bin/ranlib-clean" \
+./configure \
+  --prefix="$DIR" \
+  --enable-static
+
+make -j4
+make install
+```
+
+# 1.3.6. Download and Install Parallel-NetCDF (1.14.1)
